@@ -14,11 +14,12 @@
 	#include <unistd.h>
 
 	#define POWER_SUPPLY_CAPACITY "/sys/class/power_supply/%s/capacity"
-	#define POWER_SUPPLY_STATUS   "/sys/class/power_supply/%s/status"
+	#define POWER_SUPPLY_STATUS   "/sys/class/power_supply/BAT1/status"
 	#define POWER_SUPPLY_CHARGE   "/sys/class/power_supply/%s/charge_now"
 	#define POWER_SUPPLY_ENERGY   "/sys/class/power_supply/%s/energy_now"
 	#define POWER_SUPPLY_CURRENT  "/sys/class/power_supply/%s/current_now"
 	#define POWER_SUPPLY_POWER    "/sys/class/power_supply/%s/power_now"
+  #define POWER_SUPPLY_BAT      "/sys/class/power_supply/%d/capacity"
 
 	static const char *
 	pick(const char *bat, const char *f1, const char *f2, char *path,
@@ -52,7 +53,7 @@
 	const char *
 	battery_state(const char *bat)
 	{
-		static struct {
+static struct {
 			char *state;
 			char *symbol;
 		} map[] = {
@@ -111,6 +112,68 @@
 
 		return "";
 	}
+
+const char *
+battery_icon(const char *bat)
+{
+    char path[64];
+    int perc;
+    char status[16];
+    FILE *fp;
+
+    /* Leer porcentaje */
+    snprintf(path, sizeof(path),
+             "/sys/class/power_supply/%s/capacity", bat);
+    fp = fopen(path, "r");
+    if (!fp)
+        return "";
+
+    if (fscanf(fp, "%d", &perc) != 1) {
+        fclose(fp);
+        return "";
+    }
+    fclose(fp);
+
+    /* Leer estado */
+    snprintf(path, sizeof(path),
+             "/sys/class/power_supply/%s/status", bat);
+    fp = fopen(path, "r");
+    if (!fp)
+        return "";
+
+    if (fscanf(fp, "%15s", status) != 1) {
+        fclose(fp);
+        return "";
+    }
+    fclose(fp);
+
+    /* Decidir icono */
+    if (strcmp(status, "Charging") == 0) {
+        if (perc >= 100) return "󰂄";
+        else if (perc >= 90) return "󰂋";
+        else if (perc >= 80) return "󰂊";
+        else if (perc >= 70) return "󰢞";
+        else if (perc >= 60) return "󰂉";
+        else if (perc >= 50) return "󰢝";
+        else if (perc >= 40) return "󰂈";
+        else if (perc >= 30) return "󰂇";
+        else if (perc >= 20) return "󰂆";
+        else if (perc >= 10) return "󰢜";
+        else return "󰢟";
+    }
+    else if (strcmp(status, "Full") == 0) {
+        return "󰂄";
+    }
+    else { /* Discharging / Not charging */
+        if (perc >= 90) return "";
+        else if (perc >= 60) return "";
+        else if (perc >= 40) return "";
+        else if (perc >= 10) return "";
+        else return "";
+    }
+}
+
+
 #elif defined(__OpenBSD__)
 	#include <fcntl.h>
 	#include <machine/apmvar.h>
@@ -190,6 +253,7 @@
 
 		return NULL;
 	}
+
 #elif defined(__FreeBSD__)
 	#include <sys/sysctl.h>
 
