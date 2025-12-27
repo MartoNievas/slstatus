@@ -1,10 +1,10 @@
 /* See LICENSE file for copyright and license details. */
 
 /* interval between updates (in ms) */
-const unsigned int interval = 1000;
+const unsigned int interval = 500;
 
 /* text to show if no value can be retrieved */
-static const char unknown_str[] = "n/a";
+static const char unknown_str[] = "";
 
 /* maximum output string length */
 #define MAXLEN 2048
@@ -66,5 +66,13 @@ static const char unknown_str[] = "n/a";
  */
 static const struct arg args[] = {
 	/* function format          argument */
-	{ datetime, "%s",           "%F %T" },
+  { run_command, " %s " ,"~/.local/bin/discord_status.sh"},
+  { run_command, " :%4s |", "amixer sget Master | awk -F\"[][]\" '/%/ { print $2 }' | head -n1" }, 
+  { netspeed_rx, " %sB/s", "wlp3s0"},
+  { cpu_perc,    " [ %s%%]", NULL},
+  { ram_perc, " [ %s%%]", NULL},
+  { disk_perc, " [ %s%%]", "/"}, 
+  { battery_icon, " %s", "BAT1"},
+  { battery_perc, " %s%%", "BAT1"},
+	{ datetime, " %s",           "%a %b %d %r" },
 };
