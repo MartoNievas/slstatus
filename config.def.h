@@ -67,7 +67,7 @@ static const char unknown_str[] = "";
 static const struct arg args[] = {
 	/* function format          argument */
   { run_command, " %s " ,"~/.local/bin/discord_status.sh"},
-  { run_command, " :%4s |", "amixer sget Master | awk -F\"[][]\" '/%/ { print $2 }' | head -n1" }, 
+  { run_command, " :%4s |", "pamixer --get-volume-human" }, 
   { netspeed_rx, " %sB/s", "wlp3s0"},
   { cpu_perc,    " [ %s%%]", NULL},
   { ram_perc, " [ %s%%]", NULL},
