@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+//* See LICENSE file for copyright and license details. */
 
 /* interval between updates (in ms) */
 const unsigned int interval = 300;
@@ -64,15 +64,17 @@ static const char unknown_str[] = "";
  * wifi_essid          WiFi ESSID                      interface name (wlan0)
  * wifi_perc           WiFi signal in percent          interface name (wlan0)
  */
+
 static const struct arg args[] = {
-	/* function format          argument */
-  { run_command, " %s " ,"~/.local/bin/discord_status.sh"},
-  { run_command, " :%4s |", "pamixer --get-volume-human" }, 
-  { netspeed_rx, " %sB/s", "wlp3s0"},
-  { cpu_perc,    " [ %s%%]", NULL},
-  { ram_perc, " [ %s%%]", NULL},
-  { disk_perc, " [ %s%%]", "/"}, 
-  { battery_icon, " %s", "BAT1"},
-  { battery_perc, " %s%%", "BAT1"},
-	{ datetime, " %s",           "%a %b %d %r" },
+    /* function        format               argument */
+    {run_command, " %s |", "~/.local/bin/discord_status.sh"},
+    {run_command, " :%4s |", "pamixer --get-volume-human"},
+    {netspeed_rx, " %sB/s |", "wlan0"},
+    {cpu_perc, " [ %s%%] |", NULL},
+    {ram_perc, " [ %s%%] |", NULL},
+    {disk_perc, " [ %s%%] |", "/"},
+    {battery_icon, " %s", "BAT1"},
+    {battery_perc, " %s%% |", "BAT1"},
+    {datetime, "  %s |", "%d.%m"},
+    {datetime, "  %s ", "%H:%M"},
 };
