@@ -108,7 +108,7 @@ const char *battery_icon(const char *bat) {
   int perc;
   char status[16];
   FILE *fp;
-  /* Leer porcentaje */
+
   snprintf(path, sizeof(path), "/sys/class/power_supply/%s/capacity", bat);
   fp = fopen(path, "r");
   if (!fp)
@@ -118,7 +118,7 @@ const char *battery_icon(const char *bat) {
     return "";
   }
   fclose(fp);
-  /* Leer estado */
+
   snprintf(path, sizeof(path), "/sys/class/power_supply/%s/status", bat);
   fp = fopen(path, "r");
   if (!fp)
@@ -128,19 +128,16 @@ const char *battery_icon(const char *bat) {
     return "";
   }
   fclose(fp);
-  /* Decidir icono */
+
   if (strcmp(status, "Charging") == 0) {
-    /* TLP activo (>80%) - iconos diferentes para indicar protección */
     if (perc > 80) {
       if (perc >= 100)
-        return "󱈏"; /* 100% con TLP */
+        return "󱈏";
       else if (perc >= 90)
-        return "󱊦"; /* 90%+ con TLP */
+        return "󱊦";
       else
-        return "󱊥"; /* 80%+ con TLP */
-    }
-    /* Carga normal (≤80%) */
-    else if (perc >= 70)
+        return "󱊥";
+    } else if (perc >= 70)
       return "󰢞";
     else if (perc >= 60)
       return "󰂉";
@@ -156,47 +153,46 @@ const char *battery_icon(const char *bat) {
       return "󰢜";
     else
       return "󰢟";
+
   } else if (strcmp(status, "Full") == 0) {
     return "󰂄";
+
   } else if (strcmp(status, "Not charging") == 0) {
-    /* Not charging con >80% (TLP limitando activamente) */
-    if (perc > 80) {
-      return "󱈑"; /* Icono de protección/pausa */
-    }
-    /* Not charging normal */
-    else if (perc >= 90)
-      return "󰂂";
+    /* FIX #1: Reordenado para que los rangos sean alcanzables (perc <= 80 aquí)
+     */
+    if (perc > 80)
+      return "󱈑";
     else if (perc >= 60)
       return "󰁿";
     else if (perc >= 40)
       return "󰁼";
-    else if (perc >= 10)
-      return "󰁺";
     else
+      /* FIX #2: Eliminado el else if (perc >= 10) redundante (mismo icono) */
       return "󰁺";
-  } else { /* Discharging - niveles detallados */
+
+  } else { /* Discharging */
     if (perc >= 100)
-      return "󰁹"; /* 100% */
+      return "󰁹";
     else if (perc >= 90)
-      return "󰂂"; /* 90-99% */
+      return "󰂂";
     else if (perc >= 80)
-      return "󰂁"; /* 80-89% */
+      return "󰂁";
     else if (perc >= 70)
-      return "󰂀"; /* 70-79% */
+      return "󰂀";
     else if (perc >= 60)
-      return "󰁿"; /* 60-69% */
+      return "󰁿";
     else if (perc >= 50)
-      return "󰁾"; /* 50-59% */
+      return "󰁾";
     else if (perc >= 40)
-      return "󰁽"; /* 40-49% */
+      return "󰁽";
     else if (perc >= 30)
-      return "󰁼"; /* 30-39% */
+      return "󰁼";
     else if (perc >= 20)
-      return "󰁻"; /* 20-29% */
+      return "󰁻";
     else if (perc >= 10)
-      return "󰁺"; /* 10-19% - advertencia */
+      return "󰁺";
     else
-      return "󰂃"; /* <10% - crítico */
+      return "󰂃";
   }
 }
 
