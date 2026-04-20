@@ -65,16 +65,42 @@ static const char unknown_str[] = "";
  * wifi_perc           WiFi signal in percent          interface name (wlan0)
  */
 
+#define MODULE(name) "/home/martin/dev/suckless-btw/slstatus/shellmodules/" name
+
 static const struct arg args[] = {
-    /* function        format               argument */
-    {run_command, " %s |", "~/.local/bin/discord_status.sh"},
-    {run_command, " :%4s |", "pamixer --get-volume-human"},
-    {netspeed_rx, " %sB/s |", "wlan0"},
-    {cpu_perc, " [ %s%%] |", NULL},
-    {ram_perc, " [ %s%%] |", NULL},
-    {disk_perc, " [ %s%%] |", "/"},
-    {battery_icon, " %s", "BAT1"},
-    {battery_perc, " %s%% |", "BAT1"},
-    {datetime, "  %s |", "%d.%m"},
-    {datetime, "  %s ", "%H:%M"},
+    /* function          format                                     argument */
+    /* Bluetooth & Discord */
+    {run_command, " ^b#16161e^^c#7aa2f7^ %s ", MODULE("discord.sh")},
+    {run_command, " | %s ", MODULE("bluetooth.sh")},
+
+    /* Red (Nuevo bloque) */
+    /* Mostramos icono de red y el nombre de la conexión activa */
+    {run_command, " | 󰖩 %s ^d^ ",
+     "nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d: -f2"},
+
+    /* Teclado */
+    {run_command, " ^b#16161e^^c#a9b1d6^  %s ^d^ ",
+     "xkb-switch -p | tr '[:lower:]' '[:upper:]'"},
+
+    /* Volumen */
+    {run_command, " ^b#16161e^^c#ff9e64^  %4s ^d^ ",
+     "pamixer --get-volume-human"},
+
+    /* BLOQUE HARDWARE: CPU | RAM | DISCO | TEMP */
+    /* He extendido tu bloque de hardware para incluir la temperatura con el
+       mismo estilo */
+    {cpu_perc, " ^b#16161e^^c#2ac3de^  %s%% ", NULL},
+    {run_command, " |  %s°C ",
+     "sensors | grep 'Package id 0' | awk '{print $4}' | sed "
+     "'s/+//;s/\\.0°C//'"},
+    {ram_perc, " |  %s%% ", NULL},
+    {disk_perc, " |  %s%% ^d^ ", "/"},
+
+    /* Batería */
+    {battery_icon, " ^b#16161e^^c#f7768e^ %s ", "BAT1"},
+    {battery_perc, "%s%% ^d^ ", "BAT1"},
+
+    /* Fecha y Hora */
+    {datetime, " ^b#16161e^^c#c0caf5^ %s [ ", "%a %b %e"},
+    {datetime, "%s ] ^d^", "%H:%M:%S "},
 };
