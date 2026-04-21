@@ -65,13 +65,13 @@ static const char unknown_str[] = "";
  * wifi_perc           WiFi signal in percent          interface name (wlan0)
  */
 
-#define MODULE(name) "/home/martin/dev/suckless-btw/slstatus/shellmodules/" name
+#define MODULE(name) "/home/martin/dev/suckless-btw/scripts/" name
 
 static const struct arg args[] = {
     /* function          format                                     argument */
     /* Bluetooth & Discord */
-    {run_command, " ^b#16161e^^c#7aa2f7^ %s ", MODULE("discord.sh")},
-    {run_command, " | %s ", MODULE("bluetooth.sh")},
+    {run_command, "\x02 ^b#16161e^^c#7aa2f7^ %s ", MODULE("discord.sh")},
+    {run_command, " | %s \x03", MODULE("bluetooth.sh")},
 
     /* Red (Nuevo bloque) */
     /* Mostramos icono de red y el nombre de la conexión activa */
@@ -101,6 +101,6 @@ static const struct arg args[] = {
     {battery_perc, "%s%% ^d^ ", "BAT1"},
 
     /* Fecha y Hora */
-    {datetime, " ^b#16161e^^c#c0caf5^ %s [ ", "%a %b %e"},
+    {datetime, "\x01 ^b#16161e^^c#c0caf5^ %s [ ", "%a %b %e"},
     {datetime, "%s ] ^d^", "%H:%M:%S "},
 };
