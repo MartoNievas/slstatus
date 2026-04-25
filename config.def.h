@@ -66,7 +66,7 @@ static const char unknown_str[] = "";
  * wifi_perc           WiFi signal in percent          interface name (wlan0)
  */
 
-#define MODULE(name) "/home/martin/dev/suckless-btw/scripts/" name
+#define MODULE(name) "$HOME/dev/suckless-btw/scripts/" name
 
 #if defined(BUILD_DESKTOP)
 
