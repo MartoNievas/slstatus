@@ -29,6 +29,13 @@ COM =\
 	components/volume\
 	components/wifi
 
+# Deteccion del hostname 
+CURRENT_HOST = $(shell hostname)
+
+ifeq ($(CURRENT_HOST),)archlinux-desktop)
+    CPPFLAGS += -DBUILD_DESKTOP
+endif
+
 all: slstatus
 
 $(COM:=.o): config.mk $(REQ:=.h) slstatus.h

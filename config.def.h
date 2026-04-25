@@ -1,7 +1,6 @@
 //* See LICENSE file for copyright and license details. */
 
 /* Define config*/
-#define LAPTOP_CONFIG
 /* interval between updates (in ms) */
 const unsigned int interval = 300;
 
@@ -67,54 +66,14 @@ static const char unknown_str[] = "";
  * wifi_perc           WiFi signal in percent          interface name (wlan0)
  */
 
-#define MODULE(name) "~/dev/suckless-btw/scripts/" name
+#define MODULE(name) "/home/martin/dev/suckless-btw/scripts/" name
 
-#ifdef LAPTOP_CONFIG
-
-static const struct arg args[] = {
-    /* function          format                                     argument */
-    /* Bluetooth & Discord */
-    {run_command, "\x0c ^b#16161e^^c#7aa2f7^ %s ", MODULE("discord.sh")},
-    {run_command, "\x0b | %s ", MODULE("bluetooth.sh")},
-
-    /* Red (Nuevo bloque) */
-    /* Mostramos icono de red y el nombre de la conexión activa */
-    {run_command, "\x0a | 󰖩 %s ^d^ ",
-     "nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d: -f2"},
-
-    /* Teclado */
-    {run_command, "\x09 ^b#16161e^^c#a9b1d6^  %s ^d^ ",
-     "xkb-switch -p | tr '[:lower:]' '[:upper:]'"},
-
-    /* Volumen */
-    {run_command, "\x08 ^b#16161e^^c#ff9e64^  %4s ^d^ ",
-     "pamixer --get-volume-human"},
-
-    /* BLOQUE HARDWARE: CPU | RAM | DISCO | TEMP */
-    {cpu_perc, "\x07 ^b#16161e^^c#2ac3de^  %s%% ", NULL},
-    /* CAMBIADO: Intel via sysfs en lugar de sensors */
-    {run_command, "\x06 |  %s°C ",
-     "cat /sys/class/thermal/thermal_zone0/temp | awk '{printf \"%d\", "
-     "$1/1000}'"},
-    {ram_perc, "\x05 |  %s%% ", NULL},
-    {disk_perc, "\x04 |  %s%% ^d^ ", "/"},
-
-    /* Batería */
-    {battery_icon, "\x03 ^b#16161e^^c#f7768e^ %s ", "BAT1"},
-    {battery_perc, "\x02 %s%% ^d^ ", "BAT1"},
-
-    /* Fecha y Hora */
-    {datetime, "\x01 ^b#16161e^^c#c0caf5^ %s [ ", "%a %b %e"},
-    {datetime, "%s ] ^d^", "%H:%M:%S "},
-};
-#endif // LAPTOP_CONFIG
-
-#ifdef DESKTOP_CONFIG
+#if defined(BUILD_DESKTOP)
 
 static const struct arg args[] = {
     /* function          format                                     argument */
     /* Bluetooth & Discord */
-    {run_command, "\x09 ^b#16161e^^c#7aa2f7^ %s ", MODULE("discord.sh")},
+    {run_command, "\x09 ^b#16161e^^c#7aa2f7^ %s ", MODULE("discord-status.sh")},
 
     /* Red (Nuevo bloque) */
     /* Mostramos icono de red y el nombre de la conexión activa */
@@ -126,15 +85,16 @@ static const struct arg args[] = {
      "xkb-switch -p | tr '[:lower:]' '[:upper:]'"},
 
     /* Volumen */
-    {run_command, "\x06 ^b#16161e^^c#ff9e64^  %4s ^d^ ",
+{ run_command, "\x06 ^b#16161e^^c#ff9e64^ %s ", 
+  "pactl get-default-sink | grep -Ei 'hyperx|usb' >/dev/null && echo '󰋋' || echo '󰓃'" },
+    {run_command, "\x06 | ^b#16161e^^c#ff9e64^  %4s ^d^ ",
      "pamixer --get-volume-human"},
 
     /* BLOQUE HARDWARE: CPU | RAM | DISCO | TEMP */
     {cpu_perc, "\x05 ^b#16161e^^c#2ac3de^  %s%% ", NULL},
     /* CAMBIADO: AMD Ryzen 5 1600 AF via k10temp (Tdie) */
-    {run_command, "\x04 |  %s°C ",
-     "sensors k10temp-pci-00c3 2>/dev/null | awk "
-     "'/Tdie/{gsub(/[+°C]/,\"\",$2); printf \"%d\", $2}'"},
+{run_command, "\x04 |  %s°C ",
+     "sensors k10temp-pci-00c3 2>/dev/null | awk '/Tctl|Tdie/{print $2}' | sed 's/+//;s/°C//' | head -n1"},
     {ram_perc, "\x03 |  %s%% ", NULL},
     {disk_perc, "\x02 |  %s%% ^d^ ", "/"},
 
@@ -143,4 +103,43 @@ static const struct arg args[] = {
     {datetime, "%s ] ^d^", "%H:%M:%S "},
 };
 
-#endif // DESKTOP_CONFIG
+#else
+
+static const struct arg args[] = {
+  /* function          format                                     argument */
+  /* Bluetooth & Discord */
+  {run_command, "\x0c ^b#16161e^^c#7aa2f7^ %s ", MODULE("discord-status.sh")},
+  {run_command, "\x0b | %s ", MODULE("bluetooth-status.sh")},
+
+  /* Red (Nuevo bloque) */
+  /* Mostramos icono de red y el nombre de la conexión activa */
+  {run_command, "\x0a | 󰖩 %s ^d^ ",
+    "nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d: -f2"},
+
+  /* Teclado */
+  {run_command, "\x09 ^b#16161e^^c#a9b1d6^  %s ^d^ ",
+    "xkb-switch -p | tr '[:lower:]' '[:upper:]'"},
+
+  /* Volumen */
+  {run_command, "\x08 ^b#16161e^^c#ff9e64^  %4s ^d^ ",
+    "pamixer --get-volume-human"},
+
+  /* BLOQUE HARDWARE: CPU | RAM | DISCO | TEMP */
+  {cpu_perc, "\x07 ^b#16161e^^c#2ac3de^  %s%% ", NULL},
+  /* CAMBIADO: Intel via sysfs en lugar de sensors */
+  {run_command, "\x06 |  %s°C ",
+    "cat /sys/class/thermal/thermal_zone0/temp | awk '{printf \"%d\", "
+      "$1/1000}'"},
+  {ram_perc, "\x05 |  %s%% ", NULL},
+  {disk_perc, "\x04 |  %s%% ^d^ ", "/"},
+
+  /* Batería */
+  {battery_icon, "\x03 ^b#16161e^^c#f7768e^ %s ", "BAT1"},
+  {battery_perc, "\x02 %s%% ^d^ ", "BAT1"},
+
+  /* Fecha y Hora */
+  {datetime, "\x01 ^b#16161e^^c#c0caf5^ %s [ ", "%a %b %e"},
+  {datetime, "%s ] ^d^", "%H:%M:%S "},
+};
+
+#endif
