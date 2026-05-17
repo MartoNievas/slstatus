@@ -1,4 +1,5 @@
 *.o
+*.1
 config.h
 slstatus
 components/*.o
